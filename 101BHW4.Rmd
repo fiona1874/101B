@@ -1,0 +1,211 @@
+---
+title: "101BHW4"
+author: "JING LI"
+date: "2/23/2017"
+output: pdf_document
+---
+
+6.1
+a.
+```{r}
+cg <- 22+31+25
+a <- 32+43+29
+b <- 35+34+50
+ab <- 55+47+46
+c <- 44+45+38
+ac <- 40+37+36
+bc <- 60+50+54
+abc <- 39+41+47
+A <- 1/12*(a-cg+ab-b+ac-c+abc-bc)
+B <- 1/12*(b+ab+bc+abc-cg-a-c-ac)
+C <- 1/12*(c+ac+bc+abc-cg-a-b-ab)
+AB <- 1/12*(abc-bc+ab-b-ac+c-a+cg)
+AC <- 1/12*(cg-a+b-ab-c+ac-bc+abc)
+BC <- 1/12*(cg+a-b-ab-c-ac+bc+abc)
+ABC <- 1/12*(abc-bc-ac+c-ab+b+a-cg)
+c(A,B,C,AB,AC,BC,ABC)
+```
+The largest effects are for tool geometry(B), the cutting speed-cutting angle interaction(AC), and the cutting-angle(C).
+
+
+b.
+```{r}
+A_F <- c(0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1)
+B_F <- c(0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1)
+C_F <- c(0,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1)
+rep <- c(22,32,35,55,44,40,60,39,31,43,34,47,45,37,50,41,25,29,50,46,38,36,54,47)
+d1 <- data.frame(cbind(A_F,B_F,C_F), stringsAsFactors = TRUE)
+m1 <- aov(rep ~ A_F*B_F*C_F, data = d1)
+summary(m1)
+```
+The result agrees with the conclusion from part a.
+
+
+c.
+```{r}
+lm1 <- lm(rep ~ A_F*B_F*C_F)
+summary(lm1)
+```
+We can further reduce the model.
+```{r}
+lm1 <- lm(rep ~ A_F+B_F+C_F+A_F:C_F)
+summary(lm1)
+```
+
+REGRESSION eqn: rep=27.167+ 9.167A+11.333B+15.667C-17.667AC
+
+d.
+
+```{r}
+library(ggplot2)
+qqnorm(m1$residuals)
+qqline(m1$residuals)
+```
+
+There is no obvious violation of the assumptions.
+
+e. 
+```{r}
+interaction.plot(A_F,C_F,rep)
+```
+
+I recommend the combination of LOW A, but high B,C levels.
+
+
+6.5
+a.
+
+```{r}
+A2 <- c(0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1)
+B2 <- c(0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1)
+vib <- c(18.2,27.2,15.9,41,18.9,24,14.5,43.9,12.9,22.4,15.1,36.3,14.4,22.5,14.2,39.9)
+d2 <- data.frame(cbind(A2,B2), stringsAsFactors = TRUE)
+m2 <- aov(vib ~ A2*B2, data = d2)
+summary(m2)
+```
+
+Both A and B are effective. Besides, the interaction is also effective.
+
+b.
+```{r}
+normalplot <- function(y, label=F,  n=length(y), fac.names=NULL, xlim=c(-2.2, 2.2), main="Normal Plot", ...)
+  { # label the most singificant n effects
+    m <- length(y)
+    x <- seq(0.5/m, 1.0-0.5/m, by=1/m)
+    x <-  qnorm(x)
+    y <-  sort(y)
+    qqplot(x, y, xlab="normal quantiles", ylab="effects",  xlim=xlim, main=main, ...)
+    if(is.null(fac.names)) fac.names <-  names(y)
+    else fac.names <-  rev( c(fac.names, rep("", length(y)-length(fac.names)) ) )
+ 
+    ord=order(abs(y))
+    if(label) for(i in ord[(m-n+1):m]) text(x[i]+.35,y[i], fac.names[i])  
+}
+normalplot(m2$residuals)
+qqnorm(m2$residuals)
+qqline(m2$residuals)
+```
+```{r}
+plot(m2$residuals~m2$fitted.values)
+abline(h=0, col="red")
+```
+
+The model seems to satisfy the assumptions, there is no obvious violation.
+
+c.
+
+```{r}
+interaction.plot(A2,B2,vib)
+```
+
+
+I recommend the combination of low A and B levels.
+
+a.
+```{r}
+temp <- rep(c(0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1),2)
+titan <- rep(c(0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1),2)
+heat <- rep(c(0,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1),2)
+grain <- rep(c(0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1),2)
+cracks <- c(7.037,14.707,11.635,17.273,10.403,4.368,9.360,13.440,8.561,16.867,13.876,19.824,11.846,6.125,11.190,15.653,6.376,15.219,12.089,17.815,10.151,4.098,9.253,12.923,8.951,17.052,13.658,19.639,12.337,5.904,10.935,15.053)
+d3 <- data.frame(cbind(temp,titan,heat,grain,cracks), stringsAsFactors = TRUE)
+lm3 <- lm(cracks ~ temp*titan*heat*grain, data = d3)
+summary(lm3)
+```
+All four factors seem to be effective, the interactions temp:titan,temp:heat,titan:heat, and temp:titan:heat also appear to be effective.
+
+b.
+
+
+```{r}
+m3 <- aov(cracks ~ temp*titan*heat*grain, data = d3)
+summary(m3)
+```
+
+
+All four factors seem to be effective, the interactions temp:titan,temp:heat, and temp:titan:heat also appear to be effective.
+
+c.
+
+```{r}
+lm3n <- lm(cracks ~ temp+titan+heat+grain+temp:titan+temp:heat+temp:titan:heat, data = d3)
+summary(lm3n)
+```
+cracks=8.2731+6.7093temp+2.0418titan+0.4115heat+1.9578grain+0.6347temp:titan-11.2490temp:heat+6.4670temp:titan:heat
+
+d.
+
+```{r}
+normalplot(m3$residuals)
+```
+
+```{r}
+plot(m3$residuals~m3$fitted.values)
+abline(h=0, col="red")
+```
+
+The model seems to satisfy the assumptions, there is no obvious violation.
+
+
+f.
+
+
+```{r}
+par(mfrow=c(2,3))
+interaction.plot(temp, rep(1, length(cracks)), cracks)
+interaction.plot(titan, rep(1, length(cracks)), cracks)
+interaction.plot(heat, rep(1, length(cracks)), cracks)
+interaction.plot(grain, rep(1, length(cracks)), cracks)
+interaction.plot(temp,titan,cracks)
+interaction.plot(temp,heat,cracks)
+par(mfrow=c(1,1))
+```
+
+I recommend low level of A,B, and D, but high C.
+
+7.1
+
+```{r}
+shift <- as.factor(c(rep(1,8),rep(2,8),rep(3,8)))
+m4 <- aov(rep~A_F*B_F*C_F+shift,data = d1) 
+summary(m4)
+```
+
+The largest effects are for tool geometry(B), the cutting speed-cutting angle interaction(AC), and the cutting-angle(C).
+
+7.4
+
+Let cg,a,c,ab be block1 and c,ac,bc,acbc be block2.
+
+```{r}
+
+block <- as.factor(rep(c(1,1,1,1,2,2,2,2),3))
+d5 <- data.frame(cbind(A_F,B_F,C_F,block,rep), stringsAsFactors = TRUE)
+m5 <- aov(rep ~ A_F*B_F*C_F+block, data = d5)
+summary(m5)
+```
+
+
+The largest effects are for tool geometry(B), the cutting speed-cutting angle interaction(AC), and the cutting-angle(C).
+
+

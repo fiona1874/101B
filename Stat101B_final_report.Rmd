@@ -1,0 +1,153 @@
+---
+title: "Stat101B Final Report"
+author: "Gang Xu, Jing Li, Hun Chung, Dingrui Xue"
+date: "3/19/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+    
+    Civilization can???t exist without agriculture. So we want to study the agricultural environment on the islands and help farmers decide which field
+and what kind of fertilizer and how much fertilizer they should use in order
+to maximize the crops yields. 
+
+    To be more specific, we want to study at which levels of each fertilizer,
+nitrogenous and phosphatic, the crops produce maximum yields. We suspect that
+the higher the level of both fertilizers, the more yields the plants will
+produce.
+
+    We are going to conduct a completely randomized two-factor factorial design
+with blocking. We have two treatments, each with three levels: we label
+concentration level 1 as low level, concentration level 3 as medium, and
+concentration level 5 as high level. Our response variable is yield of plant.
+Our nuisance factors are temperature, rainfall, climate and environment of
+field. To roll out the effects of nuisance factors, we consider each field as a
+block: Biruwa, Hofn and Matalau.
+
+    All plants are randomly assigned to one of the fertilizer combinations. 
+We are going to have 3 replicates. We use R Studio to generate 27 random numbers
+from 1 to 27 without replacement. We label them Treatment 1-27. We assign same
+treatment combination to Treatment n, n+9, and n+18. (0<n<10). After they
+mature, we harvest all of them and count the fruits produced by each plant.
+
+    
+    #R codes for entering data and design 
+    
+```{r}
+# R codes for generating random numbers
+set.seed(12345)
+sample(1:27, replace = F)
+set.seed(22345)
+sample(1:27, replace = F)
+set.seed(32345)
+sample(1:27, replace = F)
+
+hofn<-c(119,145,180,141,142,150,138,153,148,194,133,160,160,135,170,151,157,
+        165,122,163,162,195,131,160,143,115,148)
+biruwa<-c(140,191,157,194,198,198,211,170,176,177,178,180,207,140,166,173,
+          183,162,154,124,116,127,143,123,194,207,169)
+matalau<-c(255,257,240,263,252,256,257,222,289,201,219,275,246,270,194,242,
+           206,199,247,247,223,195,193,201,238,222,239)
+
+hofnN<-c(1,3,5,3,1,3,5,5,3,5,1,1,1,5,3,3,3,5,1,5,3,5,1,5,3,1,1)
+hofnP<-c(3,3,5,1,3,1,1,3,3,5,1,5,5,3,5,1,3,1,3,3,5,5,1,1,5,1,5)
+biruwaN<-c(1,5,1,3,5,5,5,1,3,5,3,3,5,1,3,1,5,1,3,1,1,3,5,3,3,5,1)
+biruwaP<-c(1,3,3,5,3,3,5,5,3,1,3,3,5,1,1,5,1,3,5,3,1,1,1,1,5,5,5)
+matalauN<-c(3,5,1,5,5,3,3,1,1,5,3,5,3,5,1,5,1,3,3,5,1,1,3,3,5,1,1)
+matalauP<-c(5,3,5,3,5,5,5,3,1,5,3,5,3,3,1,1,5,1,3,1,1,3,1,1,1,3,5)
+block<- as.factor(c(rep(1,27),rep(2,27),rep(3,27)))
+N<-as.factor(c(hofnN,biruwaN,matalauN))
+P<-as.factor(c(hofnP,biruwaP,matalauP))
+results<-c(hofn,biruwa,matalau)
+Cashmeoutside<-data.frame(Nitrogen=N,Phosphate=P,Block=block,Results=results)
+head(Cashmeoutside)
+```
+
+    Now we do an exploratory analysis
+    
+    
+```{r}
+library(ggplot2)
+ggplot(Cashmeoutside, aes(y = Cashmeoutside$Results, x = Cashmeoutside$Nitrogen)) +
+geom_boxplot(aes(fill = Cashmeoutside$Phosphate)) + facet_wrap(~ Cashmeoutside$Block)
+```
+    X-axis is Nitrogen Level. Y-axis is crop yields. 1,2,3 are the three blocks
+we use, which are Biruwa, Hofn and Matalau fields. The three colors are
+different phosphate level.
+    
+    We can see from the boxplot that fruit yields are significantly different on
+different islands. We suspect that blocking variable has a great effect on fruit
+yields. It seems that the treatments also have significant effect on fruit
+yields.
+    
+    Then we go on and conduct ANOVA Analysis:
+    
+```{r}
+m1 <- aov(Results ~ factor(Nitrogen)*factor(Phosphate)+factor(Block),data=Cashmeoutside)
+summary(m1)
+```
+    From the ANOVA, we conclude that both nitrogen and phosphate have
+significant effects on plant growth due to small p-value( less than 0.05). The
+blocks also differ significantly due to small p-value. However, the ANOVA table
+does not suggest a significant interaction effect. There is little interaction
+between Nitrogen and Phosphate.
+    
+    Then we check if the assumptions of normality are met:
+    
+```{r}
+plot(m1$residuals ~ m1$fitted.values)
+qqnorm(m1$residuals)
+qqline(m1$residuals)
+```
+
+    There is nothing unusual since the residual plot seems scattered and
+patternless.Normality is satisfied since most points of the normal Q-Q plot
+follows a straight line.
+    
+    Next we exmain interaction between two treatments by looking at the
+interaction plot and main effects plot 
+    
+    
+```{r}
+interaction.plot(Cashmeoutside$Nitrogen,Cashmeoutside$Phosphate,
+                 Cashmeoutside$Results,xlab="Nitrogen",ylab="Results",
+                 trace.label = "Phosphate")
+
+
+```
+    At low level of both treatments, there is some interaction effects. But at
+high level, the lines are almost parallel, suggesting little interaction
+effects. The interaction plot suggests us to set both phosphate and nitrogen at
+high level in order to get higher yields.
+    
+    Since we don't have significant interaction effects, we go on and examine
+the main effects.
+    
+    
+```{r}
+par(mfrow = c(1,2))
+interaction.plot(N, rep(1, length(results)), results, ylim=c(160, 220),legend=F,
+								 main="Nitrogen Effect", ylab = "Yields", xlab = "Nitrogen")
+
+interaction.plot(P, rep(1, length(results)), results, ylim=c(160, 220),legend=F,
+								 main="Phosphate Effect", ylab = "Yields", xlab = "Phosphate")
+```
+
+    Both main effects nitrogen and phosphate are significant, but there is no
+interaction between factors. So, we focus on main effect plots. In main effect
+plots, as level of  factors increases, the yield increases. 
+
+    Based on the above ANOVA analysis and Interaction plot analysis we can see
+that both treatments have significant effects on crop yields. The higher the
+concentration level, the more yields the crops produce. Also the yields are
+significantly different for each fields. We have maximum yields on Matalau field
+which is on the south-most island. There is no significant interaction effect
+between nitrogenous concentration level and phosphatic concentration level.
+Thus, we conclude that in order to maximize crop yields, famers should plant
+crops on south-most island and use both fertilizers at high level. 
+
+    There is also room to improve our experiment. For example we can take
+rainfall or season into consideration. 

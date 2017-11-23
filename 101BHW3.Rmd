@@ -1,0 +1,91 @@
+---
+title: "101BHW3"
+author: "JING LI"
+date: "1/31/2017"
+output: pdf_document
+---
+
+4.1
+(a)
+MStreatment=1010.56/4=252.64
+DFblock=5
+SSblock=1503.71-169.33-1010.56=323.82
+MSe=169.33/20=8.467
+F2=MSblock/MSe=64.765/8.467=7.65
+```{r}
+pf(29.84,4,20, lower.tail = FALSE)
+pf(8.467,5,20, lower.tail = FALSE)
+```
+(b)
+5+1,6 blocks were used in this experiment.
+(c)
+The treatment affects the mean values, also the blocking factor has a large affect.
+
+4.3
+```{r}
+strength <- c(73,68,74,71,67,73,67,75,72,70,75,68,78,73,68,73,71,75,75,69)
+chemical <- c(rep("1",5),rep("2",5),rep("3",5),rep("4",5))
+bolt <- rep(c("1","2","3","4","5"),4)
+model1 = aov(strength ~ chemical+bolt)
+summary(model1)
+```
+The treatment has little effect on the mean values, but the blocking factor is significant.
+
+4.8
+```{r}
+response <- c(250,350,219,375,400,525,390,580,275,340,200,310)
+design <- c(rep("1",4),rep("2",4),rep("3",4))
+region <- rep(c("NE","NW","SE","SW"),3)
+model2 = aov(response ~ design+region)
+summary(model2)
+```
+Both the treatment and the blocking factor are significant.
+(b)
+```{r}
+TukeyHSD(model2,"design")
+```
+Design 2 is different from design 1 and 3, but design 1 and 3 are not significantly different.
+
+(c)
+
+```{r}
+qqnorm(model2$residuals)
+qqline(model2$residuals)
+plot(model2$residuals)
+abline(h=0,col="red")
+```
+The residuals are randomly scattered around 0, but there are some large residuals indicating potential outliers.
+
+4.22
+```{r}
+time_effect <- c(8,7,1,7,3,11,2,7,3,8,4,9,10,1,5,6,8,6,6,10,4,2,3,8,8)
+ingredient <- c("A","B","D","C","E","C","E","A","D","B","B","A","C","E","D","D","C","E","B","A","E","D","B","A","C")
+batch <- c(rep("1",5),rep("2",5),rep("3",5),rep("4",5),rep("5",5))
+day <- rep(c("1","2","3","4","5"),5)
+model3 <- aov(time_effect ~ ingredient+batch+day)
+summary(model3)
+```
+We reject the null.P-value is less than 0.025 hence we conclude that the five different ingredients affect the reaction time of a chemical process. 
+However, the batch and day do not appear to be significant factors.
+```{r}
+qqnorm(model3$residuals)
+qqline(model3$residuals)
+```
+There seems to be little to mild violation of the normal distrbution, the model is not perfect.
+
+4.35
+```{r}
+yield <- c(26,16,19,16,13,18,21,18,11,21,20,12,16,25,13,15,15,22,14,17,10,24,17,17,14)
+batches <- c(rep("1",5),rep("2",5),rep("3",5),rep("4",5),rep("5",5))
+acidconcentration <- rep(c("1","2","3","4","5"),5)
+times <- c("A","B","D","C","E","B","C","D","E","A","C","D","E","A","B","D","E","A","B","C","E","A","B","C","D")
+catconcentration <- c("a","b","c","d","e","c","d","e","a","b","e","a","b","c","d","b","c","d","e","a","d","e","a","b","c")
+model4 <- aov(yield ~ batches+acidconcentration+times+catconcentration)
+summary(model4)
+```
+Only the five standing times appears to be significant here. The treatment is not affecting the yield.
+
+
+
+
+

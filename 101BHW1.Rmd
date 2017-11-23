@@ -1,0 +1,204 @@
+---
+title: "101BHW1"
+author: "JING LI"
+date: "1/17/2017"
+output: pdf_document
+---
+
+UID:604416262
+SECTION:3A
+
+Chapter 1 Problems: 1.3, 1.4, 1.8, 1.9
+Chapter 2 Problems: 2.5, 2.9, 2.13, 2.15, 2.19, 2.20, 2.25, 2.28, 2.32
+
+1.3. 
+
+Step 1: Recognition of and statement of the problem- What is the growth of garden flowers under different conditions?
+Step 2: Selection of the response variable-  growth of garden flowers
+Step 3: Choice of factors, levels, and range-  
+Design factors
+Controllable
+sunlight
+water
+fertilizer
+soil condition
+Uncontrollable
+weather
+temperature 
+moisture
+insect activity
+
+1.4.
+
+Step 1: Recognition of and statement of the problem- What is the effect on a patient's weight under a diet?
+Step 2: Selection of the response variable-  the patient's weight 
+Step 3: Choice of factors, levels, and range-  
+Design factors
+Controllable
+diet
+Uncontrollable
+exercise 
+mood
+digestion efficiency
+
+1.8. 
+This allows the experimenter to obtain an estimate of experimental error, which is a basic unit of measurement to determine whether observed differences in the data are really statistically significant.
+
+Also, if the sample mean is used to estimate the true mean response for one of the factor levels, then this allows for a more precise estimate of the parameter.
+
+Helps to attain a more reliable estimate of the effect of each treatment.
+One replication might not give us enough information to form a conclusion.
+
+If we wish to test the effect of a new drug, we can randomly assign a control group and a experiment group. Multiple patients in the experiment group are replicates. If we measure one patient more than once, repetition results.
+
+
+1.9. 
+Can help average out the effects of irrelevant or unknown factors that may be present.It prevents subjective assignment.
+
+2.5. 
+(a) 
+Z=(Xbar-mu)/(sd/sqrt(n))
+```{r}
+(31.2-30)/(1.2/sqrt(16))
+pnorm(4,lower.tail = FALSE)
+```
+The 95% confidence interval does not contain the null, we will reject the null. There is evidence that mu is different from 30.
+
+(b) 
+Two-sided test. Because both mu>30 and mu<30 are considered as the alternative hypothesis.
+
+(c) 
+```{r}
+31.2+qnorm(c(0.005,0.995))*(1.2/sqrt(16))
+```
+
+(d)
+2.9.
+(a)
+```{r}
+2.35/2.01
+```
+(b) 
+Two sided test
+(c) 
+p<0.05 we reject the null. There is significant difference between the two sample mean.
+(d) 
+```{r}
+2.35+qt(c(0.05,0.95), 18)*(2.35/2.01)
+```
+
+2.13. 
+(a) 
+SE=s/sqrt(n)
+```{r}
+0.4673*sqrt(25)
+```
+Yes, we can reject the null. Because this is a two-sided test, and p<0.025, there is evidence that mean is different from 91.
+(b) 
+This is a two-sided test.
+(c) 
+t=(x-mu)/(SE)
+```{r}
+(92.5805-90)/0.4673
+pt(5.522149,24, lower.tail = FALSE)
+```
+P<0.025, we would still reject the null with a smaller p value.
+(d) 
+```{r}
+92.5805-qt(c(0.995, 0.005),24)*0.4673
+```
+(e) 
+p-value for the two-sided test is .002, so the one-sided p-value will be half as much. p=0.001
+
+
+2.15. 
+???(a)
+Yes, the null can be rejected as 0.05 level. Because p-value<0.025, there is evidence that the two sample means are different.
+
+(b) 
+This is a two-sided test
+
+(c) 
+I would still reject the null, because the difference -4.33341 is further away from 0, ensuring that the p-value for that test would be even more significant
+
+(d) 
+I would also reject the null, because the p-value for the two-sided test is aleady significant, the one-sided p-value will only be half as much. 
+
+(e) 
+```{r}
+(-2.33341)+qt(0.95,38, lower.tail = FALSE)*sqrt(1.71^2/20+2.48^2/20)
+```
+
+(f) 
+```{r}
+t <- ((-2.33341)-2)/sqrt(1.71^2/20+2.48^2/20)
+pt(t,38)
+```
+
+
+2.19. 
+```{r}
+(1.96*(3/0.5))^2
+```
+
+2.20. 
+(a) 
+H0:mu=120 Ha:mu>120
+(b) 
+```{r}
+sample1 <- c(108,124,124,106,115,138,163,159,134,139)
+mean(sample1)
+var(sample1)
+(131-120)/sqrt(382/10)
+pt(1.779758, 9,lower.tail = FALSE)
+```
+Since p-value>0.01, we fail to reject the null.
+
+(c) 
+```{r}
+pt(1.779758, 9,lower.tail = FALSE)
+```
+
+(d)
+```{r}
+131+qt(c(0.005,0.995), 9)*sqrt(382/10)
+```
+
+
+2.25. 
+```{r}
+z<-(162.5-155.0-10)/sqrt(1.0/10+1.0/12)
+qnorm(0.01, lower.tail = FALSE)
+(162.5-155.0)+qnorm(c(0.005,0.995))*sqrt(1.0/10+1.0/12)
+```
+We fail to reject the null, there is little evidence indicating that the mean difference is greater than 10. They should not use plastic 1.
+
+
+2.28  
+(a) 
+```{r}
+f<-101.17/94.73
+qf(0.025, 7,8)
+pf(f,7,8)
+```
+P-value>0.025, we fail to reject the null, we can assume that the variances are equal.
+
+(b) 
+```{r}
+Spooled <- ((8-1)*(101.17)+(9-1)*(94.73))/(8+9-2)
+t<-(12.5-10.2)/sqrt(Spooled*(1/8+1/9))
+pt(t,15)
+```
+P-value>0.025, we fail to reject the null.There is little evidence that the filtering device reduced the percentage of impurity significantly.
+
+2.32. 
+```{r}
+y1 <- c(0.265,0.265,0.266,0.267,0.267,0.265,0.267,0.267,0.265,0.268,0.268,0.265)
+mean(y1)
+y2 <- c(0.264,0.265,0.264,0.266,0.267,0.268,0.264,0.265,0.265,0.267,0.268,0.269)
+t.test(y1,y2, paired = TRUE)
+```
+p-value=0.674>0.025, there is no significant difference between the means.
+
+
+

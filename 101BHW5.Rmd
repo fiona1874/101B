@@ -1,0 +1,153 @@
+---
+title: "101BHW5"
+author: "JING LI"
+date: "3/1/2017"
+output: pdf_document
+---
+
+8.1 
+
+```{r}
+#generator: D=ABC 
+
+#defining relation: I=ABCD 
+
+#aliases: A=BCD,B=ACD,C=ABD,D=ABC,AB=CD,AC=BD,AD=BC
+A <- rep(c(-1,1),4)
+B <- rep(c(-1,-1,1,1),2)
+C <- c(rep(-1,4),rep(1,4))
+D <- c(-1,1,1,-1,1,-1,-1,1)
+yield <- c(90,72,87,83,99,81,88,80)
+m1.aov <- aov(yield ~ factor(A)*factor(B)*factor(C)*factor(D)) 
+summary(m1.aov)
+```
+```{r}
+m1 <- lm(yield ~ A*B*C*D) 
+2*coef(m1)[-1]
+```
+We can further reduce the model base on our preliminary results.
+```{r}
+m1.aov.red <- aov(yield~factor(A)+factor(B)+factor(C)+factor(A):factor(B)+factor(B):factor(C)) 
+summary(m1.aov.red)
+```
+From the result, it seems that main effect A is the most effective factor here.
+
+
+8.2 
+
+
+```{r}
+#generator: D=ABC 
+
+#defining relation: I=ABCD 
+
+#aliases: A=BCD,B=ACD,C=ABD,D=ABC,AB=CD,AC=BD,AD=BC
+
+A.2 <- rep(c(-1,1),4)
+B.2 <- rep(c(-1,-1,1,1),2)
+C.2 <- c(rep(-1,4),rep(1,4))
+D.2 <- c(-1,1,1,-1,1,-1,-1,1)
+cracks <- c(7.037,16.867,13.876,17.273,11.846,4.368,9.36,15.653) 
+m2.aov <- aov(cracks ~ factor(A.2)*factor(B.2)*factor(C.2)*factor(D.2))
+summary(m2.aov)
+```
+```{r}
+m2 <- lm(cracks ~ A.2*B.2*C.2*D.2) 
+2*coef(m2)[-1]
+```
+We can further reduce the model base on our preliminary results.
+```{r}
+m2.aov.red <- aov(cracks~factor(A.2)+factor(B.2)+factor(C.2)+factor(D.2)+factor(A.2):factor(C.2)) 
+summary(m2.aov.red)
+```
+Factors B and D appear to be more effective in this experiment, however the impact is not significant enough to make any inference.
+
+8.4 
+```{r}
+#generators: D=AB, E=AC 
+
+#defining relation: I = ABD = ACE = BCDE 
+
+#aliases: A=BD=CE,B=AD=CDE,C=AE=BDE,D=AB=BCE,E=AC=BCD,BC=DE=ACD=ABE,CD=BE=ABC=ADE
+
+A.4 <- rep(c(-1,1),4)
+B.4 <- rep(c(-1,-1,1,1),2)
+C.4 <- c(rep(-1,4),rep(1,4))
+D.4 <- c(1,-1,-1,1,1,-1,-1,1)
+E.4 <- c(1,-1,1,-1,-1,1,-1,1)
+results <- c(6,9,35,50,18,22,40,63)
+m3.aov <- aov(results~factor(A.4)*factor(B.4)*factor(C.4)*factor(D.4)*factor(E.4)) 
+summary(m3.aov)         
+```
+```{r}
+m3 <- lm(results ~ A.4*B.4*C.4*D.4*E.4) 
+2*coef(m3)[-1]
+```
+We can further reduce the model base on our preliminary results.
+
+```{r}
+m3.aov.red <- aov(results ~ factor(A.4)+factor(B.4)+factor(C.4)+factor(D.4)) 
+summary(m3.aov.red)
+```
+It seems that factor B is significant here. In other words, only B factor appears to have a great effect on the results.
+
+
+8.11
+
+a.
+
+```{r}
+# D=BE, E=AC
+A.11 <- rep(c(-1,1),4)
+B.11 <- rep(c(-1,-1,1,1),2)
+C.11 <- c(rep(-1,4),rep(1,4))
+D.11 <- c(-1,1,1,-1,1,-1,-1,1) 
+E.11 <- c(1,-1,1,-1,-1,1,-1,1)
+response <- c(23.2,16.9,16.8,15.5,23.8,23.4,16.2,18.1)
+```
+
+b.
+
+```{r}
+#defining relation: I=ACE=BDE=ABCD 
+#aliases: A=CE=ABDE=BCD,B=ABCE=DE=ACD,C=AE=BCDE=ABD,D=ACDE=BE=ACD,E=AC=BD=ABCDE,AB=BCE=ADE=CD,AD=CDE=ABE=BC
+
+```
+
+c.
+
+```{r}
+m4 <- lm(response ~ A.11+B.11+C.11+D.11+E.11) 
+2*coef(m4)[-1]
+```
+
+d.
+
+```{r}
+m4.aov <- aov(response ~ factor(A.11)+factor(B.11)+factor(C.11)+factor(D.11)+factor(E.11)) 
+
+summary(m4.aov)
+```
+
+e.
+
+```{r}
+normalplot <- function(y, label=F,  n=length(y), fac.names=NULL, xlim=c(-2.2, 2.2), main="Normal Plot", ...)
+  { # label the most singificant n effects
+    m <- length(y)
+    x <- seq(0.5/m, 1.0-0.5/m, by=1/m)
+    x <-  qnorm(x)
+    y <-  sort(y)
+    qqplot(x, y, xlab="normal quantiles", ylab="effects",  xlim=xlim, main=main, ...)
+    if(is.null(fac.names)) fac.names <-  names(y)
+    else fac.names <-  rev( c(fac.names, rep("", length(y)-length(fac.names)) ) )
+ 
+    ord=order(abs(y))
+    if(label) for(i in ord[(m-n+1):m]) text(x[i]+.35,y[i], fac.names[i])  
+  }
+
+plot(m4.aov$residuals ~ m4$fitted.values)
+normalplot(m4.aov$residuals) 
+qqline(m4.aov$residuals)
+```
+The model seems to be adequate, there is no obvious violation of the assumptions.
